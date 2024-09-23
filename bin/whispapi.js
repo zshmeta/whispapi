@@ -13,7 +13,7 @@ import { spinnit } from 'spinnit';
  * @param {string} [language='en'] - The language code for transcription.
  * @returns {Promise<string>} - Resolves with the transcription text.
  */
-export async function whispapi(filePath, format = 'txt', language = 'en') {
+export async function whispapi(filePath, format = 'txt') {
   // Define supported extensions and formats
   const audioExtensions = ['.mp3', '.wav', '.m4a', '.flac', '.ogg', '.opus', '.aac'];
   const videoExtensions = ['.mp4', '.mov', '.avi', '.mkv', '.flv', '.webm', '.wmv'];
@@ -48,7 +48,6 @@ export async function whispapi(filePath, format = 'txt', language = 'en') {
   const params = {
     encode: true,
     task: 'transcribe',
-    language, // Use the provided language code
     word_timestamps: false,
     output: format, // Request the specified output format
   };

@@ -1,50 +1,43 @@
+// whispapi.js
 import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
 import FormData from 'form-data';
-import process from 'process';
+import { spinnit } from 'spinnit';
 
-// Function to handle the transcription process
-export function whispapi() {
-  // Get the input file path from command-line arguments
-  const filePath = process.argv[process.argv.length - 1];
-
-  if (!filePath) {
-    console.error('Usage: node transcribe.js <file_path>');
-    process.exit(1);
-  }
-
-  // Check if the file exists
-  if (!fs.existsSync(filePath)) {
-    console.error(`File not found: ${filePath}`);
-    process.exit(1);
-  }
-
-  // Determine if the file is audio or video based on its extension
+/**
+ * Transcribes an audio or video file using the WhispAPI.
+ *
+ * @param {string} filePath - The path to the audio or video file to transcribe.
+ * @param {string} [format='txt'] - The desired output format ('txt', 'json', 'srt', 'vtt').
+ * @param {string} [language='en'] - The language code for transcription.
+ * @returns {Promise<string>} - Resolves with the transcription text.
+ */
+export async function whispapi(filePath, format = 'txt', language = 'en') {
+  // Define supported extensions and formats
   const audioExtensions = ['.mp3', '.wav', '.m4a', '.flac', '.ogg', '.opus', '.aac'];
   const videoExtensions = ['.mp4', '.mov', '.avi', '.mkv', '.flv', '.webm', '.wmv'];
   const allowedFormats = ['txt', 'json', 'srt', 'vtt'];
   const ext = path.extname(filePath).toLowerCase();
 
-  // Default format
-  let format = 'txt';
-
-  // Parse command-line arguments
-  const args = process.argv.slice(2);
-  const formatIndex = args.indexOf('-f');
-  if (formatIndex !== -1 && args[formatIndex + 1]) {
-    const userFormat = args[formatIndex + 1];
-    if (allowedFormats.includes(userFormat)) {
-      format = userFormat;
-    } else {
-      console.error(`Invalid format specified. Allowed formats are: ${allowedFormats.join(', ')}`);
-      process.exit(1);
-    }
+  // Validate file path
+  if (!filePath) {
+    throw new Error('File path is required.');
   }
 
+  // Check if the file exists
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`File not found: ${filePath}`);
+  }
+
+  // Check file type
   if (!audioExtensions.includes(ext) && !videoExtensions.includes(ext)) {
-    console.error('File is neither audio nor video');
-    process.exit(1);
+    throw new Error('File is neither audio nor video.');
+  }
+
+  // Validate format
+  if (!allowedFormats.includes(format)) {
+    throw new Error(`Invalid format specified. Allowed formats are: ${allowedFormats.join(', ')}`);
   }
 
   // Prepare form data
@@ -55,7 +48,7 @@ export function whispapi() {
   const params = {
     encode: true,
     task: 'transcribe',
-    language: 'en', // Set your desired language code
+    language, // Use the provided language code
     word_timestamps: false,
     output: format, // Request the specified output format
   };
@@ -74,25 +67,37 @@ export function whispapi() {
     maxBodyLength: Infinity,
   };
 
-  // inform the user that the transcription process has started
-  console.log('whispering... please wait, this can take some time...');
+  try {
+    // Inform the user that the transcription process has started
+    console.log('whispering... please wait, this can take some time...');
+    const equationSpinner = spinnit({ spinner: 'equation', speed: 200 });
+    equationSpinner.start();
 
-  axios(config)
-    .then((response) => {
-      const baseName = path.basename(filePath, path.extname(filePath));
-      const dirName = path.dirname(filePath);
-      // Response data is a string
-      console.log(response.data);
+    // Make the API request
+    const response = await axios(config);
 
-      // Save the transcription
-      const outputFilename = path.join(dirName, `${baseName}.${format}`);
-      fs.writeFileSync(outputFilename, response.data, 'utf8');
-      console.log(`Transcription saved to ${outputFilename}`);
-    })
-    .catch((error) => {
-      console.error('Error:', error.message);
-      if (error.response && error.response.data) {
-        console.error('Response data:', error.response.data);
-      }
-    });
+    // Stop the spinner
+    equationSpinner.stop(true);
+
+    // Extract base name and directory
+    const baseName = path.basename(filePath, path.extname(filePath));
+    const dirName = path.dirname(filePath);
+
+    // Log the response data
+    console.log(response.data);
+
+    // Save the transcription
+    const outputFilename = path.join(dirName, `${baseName}.${format}`);
+    fs.writeFileSync(outputFilename, response.data, 'utf8');
+    console.log(`Transcription saved to ${outputFilename}`);
+
+    // Return the transcription data
+    return response.data;
+  } catch (error) {
+    console.error('Error:', error.message);
+    if (error.response && error.response.data) {
+      console.error('Response data:', error.response.data);
+    }
+    throw error; // Re-throw the error for upstream handling
+  }
 }

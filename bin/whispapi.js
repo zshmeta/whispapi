@@ -74,6 +74,9 @@ export function whispapi() {
     maxBodyLength: Infinity,
   };
 
+  // inform the user that the transcription process has started
+  console.log('whispering... please wait, this can take some time...');
+
   axios(config)
     .then((response) => {
       const baseName = path.basename(filePath, path.extname(filePath));

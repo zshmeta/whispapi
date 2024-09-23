@@ -5,7 +5,7 @@
     "form-data": "^4.0.0",
     "spinnit": "^0.0.23"
   },
-  "version": "0.0.7",
+  "version": "0.0.8",
   "name": "whispapi",
   "description": "whisper api call",
   "main": "index.js",

@@ -7,12 +7,11 @@
   "version": "0.0.2",
   "name": "whispapi",
   "description": "whisper api call",
-  "main": "whispapi.js",
-  "devDependencies": {},
-  "bin": {
-    "whispapi": "./whispapi.js"
-  },
+  "main": "index.js",
   "type": "module",
+  "bin": {
+    "whispapi": "./index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

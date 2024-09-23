@@ -77,6 +77,8 @@ export async function whispapi(filePath, format = 'txt') {
 
     // Stop the spinner
     equationSpinner.stop(true);
+    console.log('');
+    console.log('')
 
     // Extract base name and directory
     const baseName = path.basename(filePath, path.extname(filePath));

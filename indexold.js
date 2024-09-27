@@ -2,6 +2,7 @@
 
 import { whispapi } from './bin/whispapi.js';
 import process from 'process';
+import path from 'path';
 
 /**
  * Parses command-line arguments and returns an object with options.

@@ -1,4 +1,4 @@
-// whispapi.js
+// bin/whispapi.js
 import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
@@ -13,7 +13,7 @@ import { spinnit } from 'spinnit';
  * @param {string} [language='en'] - The language code for transcription.
  * @returns {Promise<string>} - Resolves with the transcription text.
  */
-export async function whispapi(filePath, format = 'txt') {
+export async function whispapi(filePath, format = 'txt', language = 'en') {
   // Define supported extensions and formats
   const audioExtensions = ['.mp3', '.wav', '.m4a', '.flac', '.ogg', '.opus', '.aac'];
   const videoExtensions = ['.mp4', '.mov', '.avi', '.mkv', '.flv', '.webm', '.wmv'];
@@ -50,6 +50,7 @@ export async function whispapi(filePath, format = 'txt') {
     task: 'transcribe',
     word_timestamps: false,
     output: format, // Request the specified output format
+    language: language
   };
 
   // Prepare Axios request configuration
@@ -68,7 +69,7 @@ export async function whispapi(filePath, format = 'txt') {
 
   try {
     // Inform the user that the transcription process has started
-    console.log('whispering... please wait, this can take some time...');
+    console.log('Whispering... please wait, this can take some time...');
     const equationSpinner = spinnit({ spinner: 'equation', speed: 200 });
     equationSpinner.start();
 
@@ -78,7 +79,7 @@ export async function whispapi(filePath, format = 'txt') {
     // Stop the spinner
     equationSpinner.stop(true);
     console.log('');
-    console.log('')
+    console.log('');
 
     // Extract base name and directory
     const baseName = path.basename(filePath, path.extname(filePath));

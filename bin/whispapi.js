@@ -73,11 +73,17 @@ export async function whispapi(filePath, format = 'txt', language = 'en') {
     const equationSpinner = spinnit({ spinner: 'equation', speed: 200 });
     equationSpinner.start();
 
+    // we replace the console log to hide any message from the first one
+    const originalConsoleLog = console.log;
+    console.log = () => {};
+
     // Make the API request
     const response = await axios(config);
 
     // Stop the spinner
     equationSpinner.stop(true);
+    // show back the original logs
+    console.log = originalConsoleLog;
     console.log('');
     console.log('');
 

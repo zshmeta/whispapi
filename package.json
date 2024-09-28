@@ -11,10 +11,10 @@
   "main": "index.js",
   "type": "module",
   "bin": {
-    "whispapi": "./index.js"
+    "whispapi": "./bin/cli.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/example.js"
   },
   "repository": {
     "type": "git",

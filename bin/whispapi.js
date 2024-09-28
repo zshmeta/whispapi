@@ -103,3 +103,6 @@ export async function whispapi(filePath, format = 'txt', language = 'en') {
     throw error; // Re-throw the error for upstream handling
   }
 }
+
+
+export default whispapi;
